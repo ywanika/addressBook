@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}
+index
+{% endblock %}
+
+{% block main %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    <ul class=flashes>
+    {% for category, message in messages %}
+    <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+        {{message}}
+        </div>
+    {% endfor %}
+    </ul>
+{% endif %}
+{% endwith %}
+
+<form method="POST">
+    <input type="text" name="f_name" placeholder="first name">
+    <input type="text" name="l_name" placeholder="last name">
+    <label>Date Of Birth:</label>
+    <input type="date" name="dob">
+    <input type="text" name="phone" placeholder="new phone number">
+    <input type="submit" class="btn btn-dark">
+</form>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}
+index
+{% endblock %}
+
+{% block main %}
+<form method="POST">
+    <label>Sort by bloodtype:</label>
+    <select name="bloodType">
+        <option value="A+">A+</option>
+        <option value="A-">A-</option>
+        <option value="B+">B+</option>
+        <option value="B-">B-</option>
+        <option value="AB+">AB+</option>
+        <option value="AB-">AB-</option>
+        <option value="O+">O+</option>
+        <option value="O-">O-</option>
+    </select>
+    <input type="submit" class="btn btn-dark">
+</form>
+
+{% for x in people %}
+    <div class="card bg-warning" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title">{{people[x][1]}},{{people[x][0]}}</h5>
+            <p class="card-text">Date of Birth: {{people[x][3]}} <br> Phone Number: {{people[x][2]}} </p>
+            <p class="card-text">Blood Type: {{people[x][4]}} </p>
+        </div>
+    </div>
+{%  endfor %}
+
+
+{% endblock %}

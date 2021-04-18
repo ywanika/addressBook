@@ -5,6 +5,26 @@ index
 {% endblock %}
 
 {% block main %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    <ul class=flashes>
+    {% for category, message in messages %}
+    <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+        {{message}}
+        </div>
+    {% endfor %}
+    </ul>
+{% endif %}
+{% endwith %}
+
+{% if people == {}%}
+<h1>Welcome to Blood Bank</h1>
+<h3>To search for a donor, enter in the info below.</h3>
+<h3>To add a donor, click add doner above.</h3>
+{% endif %}
+
+
 <form method="POST">
     <label>Sort by bloodtype:</label>
     <select name="bloodType">
@@ -17,15 +37,16 @@ index
         <option value="O+">O+</option>
         <option value="O-">O-</option>
     </select>
+    <input type="text" name="zipcode" placeholder="ZIP Code / Pin Code">
     <input type="submit" class="btn btn-dark">
 </form>
 
 {% for x in people %}
     <div class="card bg-warning" style="width: 18rem;">
         <div class="card-body">
-            <h5 class="card-title">{{people[x][1]}},{{people[x][0]}}</h5>
-            <p class="card-text">Date of Birth: {{people[x][3]}} <br> Phone Number: {{people[x][2]}} </p>
-            <p class="card-text">Blood Type: {{people[x][4]}} </p>
+            <h5 class="card-title">{{people[x][0]}}</h5>
+            <p class="card-title">Phone Number: {{people[x][1]}} </p>
+            <p class="card-text">ZIP / Pin: {{people[x][2]}} <br> Blood Type: {{people[x][3]}} </p>
         </div>
     </div>
 {%  endfor %}

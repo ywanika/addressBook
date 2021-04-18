@@ -5,13 +5,25 @@ index
 {% endblock %}
 
 {% block main %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    <ul class=flashes>
+    {% for category, message in messages %}
+    <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+        {{message}}
+        </div>
+    {% endfor %}
+    </ul>
+{% endif %}
+{% endwith %}
+
 <form method="POST">
-    <input type="text" name="f_name" placeholder="first name">
-    <input type="text" name="l_name" placeholder="last name">
-    <input type="text" name="phone" placeholder="phone number">
-    <label>Date Of Birth:</label>
-    <input type="date" name="dob">
-    <label>Blood Type:</label>
+    <input type="text" name="name" placeholder="Initials or Fake Name">
+    <input type="text" name="phone" placeholder="Phone Number">
+    <input type="text" name="zipcode" placeholder="ZIP Code / Pin Code">
+    <input type="text" name="email" placeholder="Email Address">
+    <label> Your Blood Type:</label>
     <select name="bloodType">
         <option value="A+">A+</option>
         <option value="A-">A-</option>

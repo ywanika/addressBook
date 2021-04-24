@@ -2,15 +2,32 @@ from flask import Flask, render_template, redirect, request, flash, session
 from flask_pymongo import PyMongo
 import os
 import re
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+
 
 app = Flask (__name__)
-app.config["SECRET_KEY"] = "jjjj"
+
+if os.environ.get("SECRET_KEY") == None :
+    file = open("secretKey_string.txt","r")
+    secret_string = file.read().strip()
+    app.config['SECRET_KEY']=secret_string
+else:
+    app.config['SECRET_KEY']= os.environ.get("SECRET_KEY")
+
 if os.environ.get("MONGO_URI") == None :
     file = open("connection_string.txt","r")
     connection_string = file.read().strip()
     app.config['MONGO_URI']=connection_string
 else:
     app.config['MONGO_URI']= os.environ.get("MONGO_URI")
+
+if os.environ.get("SENDGRID_API") == None :
+    file = open("api_string.txt","r")
+    emailAPI_string = file.read().strip()
+    app.config['SENDGRID_API']=emailAPI_string
+else:
+    app.config['SENDGRID_API']= os.environ.get("SENDGRID_API")
 
 mongo = PyMongo(app)
 
@@ -84,6 +101,21 @@ def add():
         person = {"name":name, "phone": phone, "zipcode": zipcode, "bloodType": bloodType, "email": email}
         #print (person)
         mongo.db.newrecords.insert_one(person)
+
+        message = Mail(
+            from_email='ankagugu@gmail.com',
+            to_emails='ankagugu@gmail.com',
+            subject='Sending with Twilio SendGrid is Fun',
+            html_content= render_template("createUser_email.html", name = name))
+        #try:
+        sg = SendGridAPIClient(app.config['SENDGRID_API'])
+        response = sg.send(message)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+        #except Exception as e:
+            #print(e.message)
+
         flash("Added! Thank you!", "success")
         return redirect ("/")
 
@@ -119,3 +151,6 @@ if __name__ == "__main__":
 
 
 """ enter in zipcode, all they see is phone + psuedo-name, check nearest zip codes to fill in 10, search again to get 10, up to 3 sarch agains, after have to wait 10 min, OTP (verification) to register & remove, email for identifier, senf proof of registration to email - sendgrid, info icon, one blood type can donate to others, show conditions of donating blood, check box to agree to terms&conditions, recorded that they agreed, removing by email, remember zeros in zipcode"""
+"""serializer flask token (url timed sereailizer), token should have email, dotenv """
+
+"""make the email prettier, serializer flask token, confirmed key in record, secret key becomes config variable, .env"""

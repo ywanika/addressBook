@@ -4,3 +4,5 @@ __pycache__/
 connection_string.txt
 api_string.txt
 secretKey_string.txt
+domain.txt
+salt.txt

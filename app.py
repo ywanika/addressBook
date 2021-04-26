@@ -4,6 +4,7 @@ import os
 import re
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+from itsdangerous import URLSafeTimedSerializer
 
 
 app = Flask (__name__)
@@ -28,6 +29,20 @@ if os.environ.get("SENDGRID_API") == None :
     app.config['SENDGRID_API']=emailAPI_string
 else:
     app.config['SENDGRID_API']= os.environ.get("SENDGRID_API")
+
+if os.environ.get("DOMAIN") == None :
+    file = open("domain.txt","r")
+    domain = file.read().strip()
+    app.config['DOMAIN']=domain
+else:
+    app.config['DOMAIN']= os.environ.get("DOMAIN")
+
+if os.environ.get("SECURITY_PASS_SALT") == None :
+    file = open("salt.txt","r")
+    salt = file.read().strip()
+    app.config['SECURITY_PASS_SALT']=salt
+else:
+    app.config['SECURITY_PASS_SALT']= os.environ.get("SECURITY_PASS_SALT")
 
 mongo = PyMongo(app)
 
@@ -98,15 +113,20 @@ def add():
         elif not (re.search(regex, email)):
             flash("Please enter valid email", "danger")
             return redirect ("/add")
-        person = {"name":name, "phone": phone, "zipcode": zipcode, "bloodType": bloodType, "email": email}
+        person = {"name":name, "phone": phone, "zipcode": zipcode, "bloodType": bloodType, "email": email, "confirmed": False}
         #print (person)
         mongo.db.newrecords.insert_one(person)
 
+        domain = app.config['DOMAIN']
+        serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+        token = serializer.dumps(email, salt=app.config['SECURITY_PASS_SALT'])
+        url = domain + "/email_verification?token=" + token
+        
         message = Mail(
             from_email='ankagugu@gmail.com',
             to_emails='ankagugu@gmail.com',
             subject='Sending with Twilio SendGrid is Fun',
-            html_content= render_template("createUser_email.html", name = name))
+            html_content= render_template("createUser_email.html", name = name, url = url))
         #try:
         sg = SendGridAPIClient(app.config['SENDGRID_API'])
         response = sg.send(message)
@@ -114,10 +134,23 @@ def add():
         print(response.body)
         print(response.headers)
         #except Exception as e:
-            #print(e.message)
+            #print(e.message)"""
 
-        flash("Added! Thank you!", "success")
+        flash("Please check your inbox to confirm your account. Thank you!", "success")
         return redirect ("/")
+
+
+@app.route("/email_verification")
+def email_verification():
+    token = request.args.get("token")
+    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    try:
+        email = serializer.loads(token, salt=app.config['SECURITY_PASS_SALT'], max_age = (30*60))
+        mongo.db.newrecords.update_one({"email":email}, {"$set":{"confirmed":True}})
+        flash ("Your account has been confirmed! Thank you!", "success")
+    except:
+        flash("It seems this link has expired", "warning")
+    return redirect("/")
 
 
 @app.route("/deleteUser", methods= ["GET", "POST"])
@@ -147,10 +180,11 @@ def autoAddData():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
 
 
 """ enter in zipcode, all they see is phone + psuedo-name, check nearest zip codes to fill in 10, search again to get 10, up to 3 sarch agains, after have to wait 10 min, OTP (verification) to register & remove, email for identifier, senf proof of registration to email - sendgrid, info icon, one blood type can donate to others, show conditions of donating blood, check box to agree to terms&conditions, recorded that they agreed, removing by email, remember zeros in zipcode"""
 """serializer flask token (url timed sereailizer), token should have email, dotenv """
 
 """make the email prettier, serializer flask token, confirmed key in record, secret key becomes config variable, .env"""
+"""confirm email to delete user"""

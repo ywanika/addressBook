@@ -21,7 +21,7 @@ index
 {% if people == {}%}
 <h1>Welcome to Blood Bank</h1>
 <h3>To search for a donor, enter in the info below.</h3>
-<h3>To add a donor, click add doner above.</h3>
+<h3>To add a donor, click add donor above.</h3>
 {% endif %}
 
 
@@ -41,15 +41,17 @@ index
     <input type="submit" class="btn btn-dark">
 </form>
 
-{% for x in people %}
-    <div class="card bg-warning" style="width: 18rem;">
-        <div class="card-body">
-            <h5 class="card-title">{{people[x][0]}}</h5>
-            <p class="card-title">Phone Number: {{people[x][1]}} </p>
-            <p class="card-text">ZIP / Pin: {{people[x][2]}} <br> Blood Type: {{people[x][3]}} </p>
+<div class = "row">
+    {% for x in people %}
+        <div class="card bg-warning col-4" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">{{people[x][0]}}</h5>
+                <p class="card-title">Phone Number: {{people[x][1]}} </p>
+                <p class="card-text">ZIP / Pin: {{people[x][2]}} <br> Blood Type: {{people[x][3]}} </p>
+            </div>
         </div>
-    </div>
-{%  endfor %}
+    {%  endfor %}
+</div>
 
 
 {% endblock %}

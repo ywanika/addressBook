@@ -5,44 +5,23 @@ import re
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from itsdangerous import URLSafeTimedSerializer
+from dotenv import load_dotenv
 
+# loading environment from .env file
+app_path = os.path.join(os.path.dirname(__file__), '.')
+dotenv_path = os.path.join(app_path, '.env')
+load_dotenv(dotenv_path)
 
 app = Flask (__name__)
 
-if os.environ.get("SECRET_KEY") == None :
-    file = open("secretKey_string.txt","r")
-    secret_string = file.read().strip()
-    app.config['SECRET_KEY']=secret_string
-else:
-    app.config['SECRET_KEY']= os.environ.get("SECRET_KEY")
+app.config.update(
+    MONGO_URI= os.environ.get("MONGO_URI"),
+    SECRET_KEY= os.environ.get("SECRET_KEY"),
+    SENDGRID_API= os.environ.get("SENDGRID_API"),
+    DOMAIN= os.environ.get("DOMAIN"),
+    SECURITY_PASS_SALT= os.environ.get("SECURITY_PASS_SALT")
+)
 
-if os.environ.get("MONGO_URI") == None :
-    file = open("connection_string.txt","r")
-    connection_string = file.read().strip()
-    app.config['MONGO_URI']=connection_string
-else:
-    app.config['MONGO_URI']= os.environ.get("MONGO_URI")
-
-if os.environ.get("SENDGRID_API") == None :
-    file = open("api_string.txt","r")
-    emailAPI_string = file.read().strip()
-    app.config['SENDGRID_API']=emailAPI_string
-else:
-    app.config['SENDGRID_API']= os.environ.get("SENDGRID_API")
-
-if os.environ.get("DOMAIN") == None :
-    file = open("domain.txt","r")
-    domain = file.read().strip()
-    app.config['DOMAIN']=domain
-else:
-    app.config['DOMAIN']= os.environ.get("DOMAIN")
-
-if os.environ.get("SECURITY_PASS_SALT") == None :
-    file = open("salt.txt","r")
-    salt = file.read().strip()
-    app.config['SECURITY_PASS_SALT']=salt
-else:
-    app.config['SECURITY_PASS_SALT']= os.environ.get("SECURITY_PASS_SALT")
 
 mongo = PyMongo(app)
 
@@ -183,7 +162,7 @@ if __name__ == "__main__":
     app.run()
 
 
-""" enter in zipcode, all they see is phone + psuedo-name, check nearest zip codes to fill in 10, search again to get 10, up to 3 sarch agains, after have to wait 10 min, OTP (verification) to register & remove, email for identifier, senf proof of registration to email - sendgrid, info icon, one blood type can donate to others, show conditions of donating blood, check box to agree to terms&conditions, recorded that they agreed, removing by email, remember zeros in zipcode"""
+""" enter in zipcode, all they see is phone + psuedo-name, check nearest zip codes to fill in 10, search again to get 10, up to 3 sarch agains, after have to wait 10 min, OTP (verification) to register & remove, email for identifier, senf proof of registration to email - sendgrid, info icon, one blood type can donate to others, show conditions of donating blood, check box to agree to terms&conditions, recorded that they agreed, removing by email, remember zeros in zipcode, pagination"""
 """serializer flask token (url timed sereailizer), token should have email, dotenv """
 
 """make the email prettier, serializer flask token, confirmed key in record, secret key becomes config variable, .env"""

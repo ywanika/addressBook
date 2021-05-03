@@ -35,6 +35,8 @@ def showData():
     else:
         bloodType = request.form ["bloodType"]
         zipcode = request.form ["zipcode"].strip()
+        button = request.form["button"]
+        print (button)
         if not zipcode.isnumeric():
             flash("zipcode must be numeric", "warning")
             return redirect ("/")
@@ -45,8 +47,10 @@ def showData():
         
         name = ""
         people =  {}
-        #persons = mongo.db.newrecords.find({"bloodType":bloodType, "zipcode": zipcode})
-        persons = mongo.db.newrecords.aggregate([ {"$match":{"bloodType":bloodType, "zipcode": zipcode}}, {"$sample":{ "size": 10 }} ])
+        #persons = mongo.db.donors.find({"bloodType":bloodType, "zipcode": zipcode})
+        persons = mongo.db.donors.aggregate([ {"$match":{"bloodType":bloodType, "zipcode": zipcode, "confirmed": True}}, {"$sample":{ "size": 10 }} ])
+        if button == "Search Plasma Donors":
+            persons = mongo.db.donors.aggregate([ {"$match":{"bloodType":bloodType, "zipcode": zipcode, "confirmed": True, "plasma": True}}, {"$sample":{ "size": 10 }} ])
         #print(persons)
         for person in persons:
             if "name" in person:
@@ -55,14 +59,18 @@ def showData():
             #print (person, people)"""
 
         if len(people) < 10:
-            persons = mongo.db.newrecords.aggregate([ {"$match":{"bloodType":bloodType, "zipcode": searchZipcodeUP}}, {"$sample":{ "size": 10 - len(people) }} ])
+            persons = mongo.db.donors.aggregate([ {"$match":{"bloodType":bloodType, "zipcode": searchZipcodeUP, "confirmed": True}}, {"$sample":{ "size": 10 - len(people) }} ])
+            if button == "Search Plasma Donors":
+                persons = mongo.db.donors.aggregate([ {"$match":{"bloodType":bloodType, "zipcode": searchZipcodeUP, "confirmed": True, "plasma": True}}, {"$sample":{ "size": 10 }} ])
             for person in persons:
                 if "name" in person:
                     name = person["name"]
                 people [person["_id"]] = [name, person["phone"], person["zipcode"], person["bloodType"]]
 
         if len(people) < 10:
-            persons = mongo.db.newrecords.aggregate([ {"$match":{"bloodType":bloodType, "zipcode": searchZipcodeDOWN}}, {"$sample":{ "size": 10 - len(people) }} ])
+            persons = mongo.db.donors.aggregate([ {"$match":{"bloodType":bloodType, "zipcode": searchZipcodeDOWN, "confirmed": True}}, {"$sample":{ "size": 10 - len(people) }} ])
+            if button == "Search Plasma Donors":
+                persons = mongo.db.donors.aggregate([ {"$match":{"bloodType":bloodType, "zipcode": searchZipcodeDOWN, "confirmed": True, "plasma": True}}, {"$sample":{ "size": 10 }} ])
             for person in persons:
                 if "name" in person:
                     name = person["name"]
@@ -86,15 +94,24 @@ def add():
         zipcode = request.form ["zipcode"].strip()
         bloodType = request.form ["bloodType"]
         email = request.form ["email"].strip()
-        if (phone == "" or zipcode == ""):
+        if "TandC" in request.form:
+            agree = request.form["TandC"]
+            print (agree)
+        else:
+            flash("Please agree to terms and conditions if you wish to register", "danger")
+            return redirect ("/add")
+        if (phone == "" or zipcode == "" or bloodType == ""):
             flash("Please fill in all fields", "danger")
             return redirect ("/add")
         elif not (re.search(regex, email)):
             flash("Please enter valid email", "danger")
             return redirect ("/add")
-        person = {"name":name, "phone": phone, "zipcode": zipcode, "bloodType": bloodType, "email": email, "confirmed": False}
+        elif not ( zipcode.isnumeric() and phone.isnumeric() ):
+            flash("Please enter numeric values for phone and zipcode", "danger")
+            return redirect ("/add")
+        person = {"name":name, "phone": phone, "zipcode": zipcode, "bloodType": bloodType, "email": email, "confirmed": False, "agreed_TandC":True}
         #print (person)
-        mongo.db.newrecords.insert_one(person)
+        mongo.db.donors.insert_one(person)
 
         domain = app.config['DOMAIN']
         serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
@@ -125,7 +142,7 @@ def email_verification():
     serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
     try:
         email = serializer.loads(token, salt=app.config['SECURITY_PASS_SALT'], max_age = (30*60))
-        mongo.db.newrecords.update_one({"email":email}, {"$set":{"confirmed":True}})
+        mongo.db.donors.update_one({"email":email}, {"$set":{"confirmed":True}})
         flash ("Your account has been confirmed! Thank you!", "success")
     except:
         flash("It seems this link has expired", "warning")
@@ -139,27 +156,38 @@ def deleteUser():
     else:
         name = request.form ["name"].strip()
         phone = request.form ["phone"].strip()
-        person = mongo.db.newrecords.find_one({"name":name, "phone": phone})
+        person = mongo.db.donors.find_one({"name":name, "phone": phone})
         if person != None:
-            mongo.db.newrecords.delete_one({"name":name, "phone": phone})
+            mongo.db.donors.delete_one({"name":name, "phone": phone})
             flash( name+" removed !", "success")
             return redirect ("/")
         flash("didn't work", "warning")
         return redirect ("/deleteUser")
 
+@app.route("/otherResources")
+def otherResource():
+    return render_template ("otherResources.html")
 
 @app.route("/autoAddData")
 def autoAddData():
-    for x in range (10):
-        person = {"name":"TEST", "phone": "1234", "zipcode": "0000", "bloodType": "A+"}
+    for x in range (5):
+        person = {"name":"TEST", "phone": "123"+str(x), "zipcode": "0010", "bloodType": "A+","email": "test"+str(x)+"@anika.com", "confirmed": True }
         #print (person)
-        mongo.db.newrecords.insert_one(person)
+        mongo.db.donors.insert_one(person)
+    for x in range (5):
+        person = {"name":"TEST", "phone": "122"+str(x), "zipcode": "0011", "bloodType": "A-","email": "test1"+str(x)+"@anika.com", "confirmed": True }
+        #print (person)
+        mongo.db.donors.insert_one(person)
+    for x in range (5):
+        person = {"name":"TEST", "phone": "121"+str(x), "zipcode": "0009", "bloodType": "O-","email": "test2"+str(x)+"@anika.com", "confirmed": True }
+        #print (person)
+        mongo.db.donors.insert_one(person)
     flash("Added! Thank you!", "success")
     return redirect ("/")
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
 
 
 """ enter in zipcode, all they see is phone + psuedo-name, check nearest zip codes to fill in 10, search again to get 10, up to 3 sarch agains, after have to wait 10 min, OTP (verification) to register & remove, email for identifier, senf proof of registration to email - sendgrid, info icon, one blood type can donate to others, show conditions of donating blood, check box to agree to terms&conditions, recorded that they agreed, removing by email, remember zeros in zipcode, pagination"""

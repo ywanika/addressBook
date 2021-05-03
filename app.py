@@ -40,17 +40,32 @@ def showData():
         if not zipcode.isnumeric():
             flash("zipcode must be numeric", "warning")
             return redirect ("/")
+
         #make sure to retain leading zeros in zip when adding and subtracting 1
         lenZip = len(zipcode)
         searchZipcodeUP = ( str( int(zipcode) + 1 ) ).zfill(lenZip)
         searchZipcodeDOWN = ( str( int(zipcode) - 1 ) ).zfill(lenZip)
+
+        possibleTypes={"AB+":["O-", "O+", "B-", "B+", "A-", "A+", "AB-", "AB+"],
+        "AB-":["O-", "B-", "A-", "AB-"],
+        "A+":["O-", "O+", "A-", "A+"],
+        "A-":["O-", "A-"],
+        "B+":["O-", "O+", "B-", "B+"],
+        "B-":["O-", "B-"],
+        "O+":["O-", "O+"],
+        "O-":["O-"]}
+        donorTypes=[]
+        for donorType in possibleTypes[bloodType]:
+            donorTypes.append({"bloodType":donorType})
+            print (donorTypes)
+            #db.inventory.find( { $or: [ { quantity: 20 } , { price: 10 } ] } )
         
         name = ""
         people =  {}
         #persons = mongo.db.donors.find({"bloodType":bloodType, "zipcode": zipcode})
-        persons = mongo.db.donors.aggregate([ {"$match":{"bloodType":bloodType, "zipcode": zipcode, "confirmed": True}}, {"$sample":{ "size": 10 }} ])
+        persons = mongo.db.donors.aggregate([ {"$match": { "$or": donorTypes , "zipcode": zipcode, "confirmed": True}}, {"$sample":{ "size": 10 }} ])
         if button == "Search Plasma Donors":
-            persons = mongo.db.donors.aggregate([ {"$match":{"bloodType":bloodType, "zipcode": zipcode, "confirmed": True, "plasma": True}}, {"$sample":{ "size": 10 }} ])
+            persons = mongo.db.donors.aggregate([ {"$match":{"$or": donorTypes, "zipcode": zipcode, "confirmed": True, "plasma": True}}, {"$sample":{ "size": 10 }} ])
         #print(persons)
         for person in persons:
             if "name" in person:
@@ -59,18 +74,18 @@ def showData():
             #print (person, people)"""
 
         if len(people) < 10:
-            persons = mongo.db.donors.aggregate([ {"$match":{"bloodType":bloodType, "zipcode": searchZipcodeUP, "confirmed": True}}, {"$sample":{ "size": 10 - len(people) }} ])
+            persons = mongo.db.donors.aggregate([ {"$match":{"$or": donorTypes, "zipcode": searchZipcodeUP, "confirmed": True}}, {"$sample":{ "size": 10 - len(people) }} ])
             if button == "Search Plasma Donors":
-                persons = mongo.db.donors.aggregate([ {"$match":{"bloodType":bloodType, "zipcode": searchZipcodeUP, "confirmed": True, "plasma": True}}, {"$sample":{ "size": 10 }} ])
+                persons = mongo.db.donors.aggregate([ {"$match":{"$or": donorTypes, "zipcode": searchZipcodeUP, "confirmed": True, "plasma": True}}, {"$sample":{ "size": 10 }} ])
             for person in persons:
                 if "name" in person:
                     name = person["name"]
                 people [person["_id"]] = [name, person["phone"], person["zipcode"], person["bloodType"]]
 
         if len(people) < 10:
-            persons = mongo.db.donors.aggregate([ {"$match":{"bloodType":bloodType, "zipcode": searchZipcodeDOWN, "confirmed": True}}, {"$sample":{ "size": 10 - len(people) }} ])
+            persons = mongo.db.donors.aggregate([ {"$match":{"$or": donorTypes, "zipcode": searchZipcodeDOWN, "confirmed": True}}, {"$sample":{ "size": 10 - len(people) }} ])
             if button == "Search Plasma Donors":
-                persons = mongo.db.donors.aggregate([ {"$match":{"bloodType":bloodType, "zipcode": searchZipcodeDOWN, "confirmed": True, "plasma": True}}, {"$sample":{ "size": 10 }} ])
+                persons = mongo.db.donors.aggregate([ {"$match":{"$or": donorTypes, "zipcode": searchZipcodeDOWN, "confirmed": True, "plasma": True}}, {"$sample":{ "size": 10 }} ])
             for person in persons:
                 if "name" in person:
                     name = person["name"]
@@ -94,8 +109,11 @@ def add():
         zipcode = request.form ["zipcode"].strip()
         bloodType = request.form ["bloodType"]
         email = request.form ["email"].strip()
+        plasma = False
+        if "plasma" in request.form:
+            plasma = True
         if "TandC" in request.form:
-            agree = request.form["TandC"]
+            agree = True
             print (agree)
         else:
             flash("Please agree to terms and conditions if you wish to register", "danger")
@@ -109,7 +127,7 @@ def add():
         elif not ( zipcode.isnumeric() and phone.isnumeric() ):
             flash("Please enter numeric values for phone and zipcode", "danger")
             return redirect ("/add")
-        person = {"name":name, "phone": phone, "zipcode": zipcode, "bloodType": bloodType, "email": email, "confirmed": False, "agreed_TandC":True}
+        person = {"name":name, "phone": phone, "zipcode": zipcode, "bloodType": bloodType, "email": email, "confirmed": False, "agreed_TandC":agree, "plasma":plasma}
         #print (person)
         mongo.db.donors.insert_one(person)
 

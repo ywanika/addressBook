@@ -137,18 +137,15 @@ def add():
         url = domain + "/email_verification?token=" + token
         
         message = Mail(
-            from_email='ankagugu@gmail.com',
+            from_email='donotreply@vitalrelation.com',
             to_emails='ankagugu@gmail.com',
-            subject='Sending with Twilio SendGrid is Fun',
-            html_content= render_template("createUser_email.html", name = name, url = url))
-        #try:
-        sg = SendGridAPIClient(app.config['SENDGRID_API'])
-        response = sg.send(message)
-        print(response.status_code)
-        print(response.body)
-        print(response.headers)
-        #except Exception as e:
-            #print(e.message)"""
+            subject='Vital Realtion - Account Confirmation',
+            html_content= render_template("createUser_email.html", name = name, phone = phone, zipcode = zipcode, bloodType = bloodType, url = url))
+        try:
+            sg = SendGridAPIClient(app.config['SENDGRID_API'])
+            response = sg.send(message)
+        except Exception as e:
+            print(e.message)
 
         flash("Please check your inbox to confirm your account. Thank you!", "success")
         return redirect ("/")
@@ -159,7 +156,7 @@ def email_verification():
     token = request.args.get("token")
     serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
     try:
-        email = serializer.loads(token, salt=app.config['SECURITY_PASS_SALT'], max_age = (30*60))
+        email = serializer.loads(token, salt=app.config['SECURITY_PASS_SALT'], max_age = (45*60))
         mongo.db.donors.update_one({"email":email}, {"$set":{"confirmed":True}})
         flash ("Your account has been confirmed! Thank you!", "success")
     except:
@@ -205,7 +202,7 @@ def autoAddData():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
 
 
 """ enter in zipcode, all they see is phone + psuedo-name, check nearest zip codes to fill in 10, search again to get 10, up to 3 sarch agains, after have to wait 10 min, OTP (verification) to register & remove, email for identifier, senf proof of registration to email - sendgrid, info icon, one blood type can donate to others, show conditions of donating blood, check box to agree to terms&conditions, recorded that they agreed, removing by email, remember zeros in zipcode, pagination"""
@@ -213,3 +210,8 @@ if __name__ == "__main__":
 
 """make the email prettier, serializer flask token, confirmed key in record, secret key becomes config variable, .env"""
 """confirm email to delete user"""
+
+"""https://covidwin.in/               Tracking availability of many types of Covid related resources.
+https://covid19-twitter.in/    Twitter query generator which finds info from Twitter.
+https://covid19.neera.ai/      Provides beds information
+https://covidfightclub.org/   Lists Covid resource availability with phone numbers."""

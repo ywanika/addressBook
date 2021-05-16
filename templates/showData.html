@@ -34,7 +34,7 @@
         <option value="O+">O+</option>
         <option value="O-">O-</option>
     </select>
-    <input type="text" name="zipcode" placeholder="ZIP Code / Pin Code">
+    <input type="text" name="place" placeholder="City, State, Country" id= "searchCity">
     <input type="submit" value = "Search Blood Donors" class="btn btn-dark" name= "button">
     <input type="submit" value = "Search Plasma Donors" class="btn btn-dark" name= "button">
 </form>
@@ -43,13 +43,24 @@
     {% for x in people %}
         <div class="card bg-warning col-4" style="width: 18rem;">
             <div class="card-body">
-                <h5 class="card-title">{{people[x][0]}}</h5>
+                <h5 class="card-title">{{people[x][0].title()}}</h5>
                 <p class="card-title">Phone Number: {{people[x][1]}} </p>
-                <p class="card-text">ZIP / Pin: {{people[x][2]}} <br> Blood Type: {{people[x][3]}} </p>
+                <p class="card-text">Place: {{people[x][2]}} <br> Blood Type: {{people[x][3]}} </p>
             </div>
         </div>
     {%  endfor %}
 </div>
 
+{% endblock %}
 
+{% block scripts %}
+<script>
+    function activatePlacesSearch(){
+        var input = document.getElementById("searchCity")
+        var autocomplete = new google.maps.places.Autocomplete(input);
+    }
+</script>
+<script async
+src="https://maps.googleapis.com/maps/api/js?key={{places}}&libraries=places&callback=activatePlacesSearch">
+</script>
 {% endblock %}

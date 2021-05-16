@@ -14,40 +14,15 @@
 {% endif %}
 {% endwith %}
 
-<!--<form method="POST">
-    
-    <input type="text" name="name" placeholder="Initials or Fake Name">
-    <input type="text" name="phone" placeholder="Phone Number">
-    <input type="text" name="zipcode" placeholder="ZIP Code / Pin Code">
-    <input type="text" name="email" placeholder="Email Address">
-    <label> Your Blood Type:</label>
-    <select name="bloodType">
-        <option value= "" >-- Pick Option Below --</option>
-        <option value="A+">A+</option>
-        <option value="A-">A-</option>
-        <option value="B+">B+</option>
-        <option value="B-">B-</option>
-        <option value="AB+">AB+</option>
-        <option value="AB-">AB-</option>
-        <option value="O+">O+</option>
-        <option value="O-">O-</option>
-    </select>
-    <label for = "TandC"> By clicking this checkbox, I agree to terms and conditions, that all of the information that has been submitted is true to the best of my knowledge, and I meet all the required medical criteria to donate:</label>
-    <input type="checkbox" name="TandC" id = "TandC" required>
-    <label for = "plasma">Are you in a position to donate plasma?</label>
-    <input type="checkbox" name="plasma" id = "plasma" required>
-    <input type="submit" class="btn btn-dark">
-</form>-->
-
-<form class="row gx-5 mx-4">
-    <div class="col-md-6">
+<form class="row gx-5 mx-4" method="POST">
+    <div class="col-md-6 p-2">
         <label class="form-label">Initials or Fake Name</label>
         <input type="text" class="form-control" name="name">
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6 p-2">
         <label class="form-label">Blood Type</label>
         <select class="form-select" name="bloodType">
-            <option selected>Pick Option Below...</option>
+            <option selected value="">Pick Option Below...</option>
             <option value="A+">A+</option>
             <option value="A-">A-</option>
             <option value="B+">B+</option>
@@ -58,38 +33,57 @@
             <option value="O-">O-</option>
         </select>
     </div>
-    <div class="col-12">
-        <label class="form-label">ZIP Code / Pin Code</label>
-        <input type="text" class="form-control" name="zipcode">
+    <div class="col-12 p-2">
+        <label class="form-label">City, State, Country</label>
+        <input type="text" class="form-control" name="place" id="searchCity">
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6 p-2">
         <label class="form-label">Phone Number</label>
         <input type="text" class="form-control" name="phone">
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6 p-2">
         <label class="form-label">Email Address</label>
         <input type="text" class="form-control" name="email">
     </div>
     <div class="col-12">
-        <div class="form-check">
+        <div class="form-check p-2">
             <label class="form-check-label" for="TandC">
                 By clicking this checkbox, I agree that all of the information that has been submitted is true to the
-                best of my knowledge, and I meet all the required medical criteria to donate.
+                best of my knowledge, and I meet all the required medical criteria to donate. Also, I agree that my 
+                information can be shown on the software depending upon the requirement of the users of the software.
             </label>
             <input class="form-check-input" name="TandC" type="checkbox" id="TandC" required>
         </div>
     </div>
     <div class="col-12">
-        <div class="form-check">
+        <div class="form-check p-2">
             <label class="form-check-label" for="plasma">
                 Are you in a position to donate plasma?
             </label>
             <input class="form-check-input" name="plasma" type="checkbox" id="plasma">
         </div>
     </div>
-    <div class="col-12">
+    <div class="col-12 p-2">
         <button type="submit" class="btn btn-dark">Submit</button>
     </div>
 </form>
 
+<a href="https://www.who.int/campaigns/world-blood-donor-day/2018/who-can-give-blood">Who can give blood?</a>
+<br>
+<a href="https://www.indianredcross.org/ircs/program/BloodBank">Guidelines for blood donors in India</a>
+<br>
+<a href="https://indianexpress.com/article/lifestyle/health/how-often-can-you-donate-plasma-7291597/">Who can donate plasma in India?</a>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function activatePlacesSearch(){
+        var input = document.getElementById("searchCity")
+        var autocomplete = new google.maps.places.Autocomplete(input);
+    }
+</script>
+<script async
+src="https://maps.googleapis.com/maps/api/js?key={{places}}&libraries=places&callback=activatePlacesSearch">
+</script>
 {% endblock %}

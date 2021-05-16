@@ -129,7 +129,9 @@ def add():
 
         domain = app.config['DOMAIN']
         serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+        print ("hi",domain, email)
         token = serializer.dumps(email, salt=app.config['SECURITY_PASS_SALT'])
+        print ("hello",token)
         url = domain + "/email_verification?token=" + token
         
         message = Mail(
@@ -201,7 +203,7 @@ if __name__ == "__main__":
 
 
 """up to 3 sarch agains, after have to wait 10 min, info icon"""
-#remove debug, change recieving email, from email
+#remove debug, change recieving email, from email, .org
 """make the email prettier"""
 """confirm email to delete user"""
 

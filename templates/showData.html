@@ -25,6 +25,7 @@
 <form method="POST">
     <label>Sort by bloodtype:</label>
     <select name="bloodType">
+        <option selected value="">{{searchedType}}</option>
         <option value="A+">A+</option>
         <option value="A-">A-</option>
         <option value="B+">B+</option>
@@ -34,7 +35,7 @@
         <option value="O+">O+</option>
         <option value="O-">O-</option>
     </select>
-    <input type="text" name="place" placeholder="City, State, Country" id= "searchCity">
+    <input type="text" name="place" value = "{{searchedPlace}}" placeholder="City, State, Country" id= "searchCity">
     <input type="submit" value = "Search Blood Donors" class="btn btn-dark" name= "button">
     <input type="submit" value = "Search Plasma Donors" class="btn btn-dark" name= "button">
 </form>
@@ -50,6 +51,13 @@
         </div>
     {%  endfor %}
 </div>
+ {% if people != {} %}
+<form method = "POST">
+    <input type = "text" name = "place" value= "{{searchedPlace}}" hidden>
+    <input type = "text" name = "bloodType" value="{{searchedType}}" hidden>
+    <input type="submit" value="Search Again" class="btn btn-dark" name= "searchAgain">
+</form>
+{% endif %}
 
 {% endblock %}
 

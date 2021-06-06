@@ -32,67 +32,52 @@ regex = '^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$' #for sever-side validation
 @app.route("/", methods= ["GET", "POST"])
 def showData():
     if request.method == "GET":
-        return render_template ("showData.html", people={}, places=app.config['PLACES_API'])
+        return render_template ("showData.html", people={}, places=app.config['PLACES_API'], searchedType = "Pick Option Below...")
     else:
-        bloodType = request.form ["bloodType"]
-        place = request.form ["place"].strip()
-        button = request.form["button"]
+        if "button" in request.form:
+            bloodType = request.form ["bloodType"]
+            place = request.form ["place"].strip()
+            button = request.form["button"]
 
-        #make sure to retain leading zeros in zip when adding and subtracting 1
-        """lenZip = len(zipcode)
-        searchZipcodeUP = ( str( int(zipcode) + 1 ) ).zfill(lenZip)
-        searchZipcodeDOWN = ( str( int(zipcode) - 1 ) ).zfill(lenZip)"""
+            if (bloodType == "" or place == ""):
+                flash("Please fill in all fields", "danger")
+                return redirect ("/")
 
-        possibleTypes={"AB+":["O-", "O+", "B-", "B+", "A-", "A+", "AB-", "AB+"],
-        "AB-":["O-", "B-", "A-", "AB-"],
-        "A+":["O-", "O+", "A-", "A+"],
-        "A-":["O-", "A-"],
-        "B+":["O-", "O+", "B-", "B+"],
-        "B-":["O-", "B-"],
-        "O+":["O-", "O+"],
-        "O-":["O-"]}
-        donorTypes=[]
-        for donorType in possibleTypes[bloodType]:
-            donorTypes.append({"bloodType":donorType})
-            #db.inventory.find( { $or: [ { quantity: 20 } , { price: 10 } ] } )
-        
-        name = ""
-        people =  {}
-        #persons = mongo.db.donors.find({"bloodType":bloodType, "zipcode": zipcode})
-        persons = mongo.db.donors.aggregate([ {"$match": { "$or": donorTypes , "place": place, "confirmed": True}}, {"$sample":{ "size": 10 }} ])
-        if button == "Search Plasma Donors":
-            persons = mongo.db.donors.aggregate([ {"$match":{"$or": donorTypes, "place": place, "confirmed": True, "plasma": True}}, {"$sample":{ "size": 10 }} ])
-        #print(persons)
-        for person in persons:
-            if "name" in person:
-                name = person["name"]
-            people [person["_id"]] = [name, person["phone"], person["place"], person["bloodType"]]
-            #print (person, people)"""
-
-        """if len(people) < 10:
-            persons = mongo.db.donors.aggregate([ {"$match":{"$or": donorTypes, "zipcode": searchZipcodeUP, "confirmed": True}}, {"$sample":{ "size": 10 - len(people) }} ])
+            possibleTypes={"AB+":["O-", "O+", "B-", "B+", "A-", "A+", "AB-", "AB+"],
+            "AB-":["O-", "B-", "A-", "AB-"],
+            "A+":["O-", "O+", "A-", "A+"],
+            "A-":["O-", "A-"],
+            "B+":["O-", "O+", "B-", "B+"],
+            "B-":["O-", "B-"],
+            "O+":["O-", "O+"],
+            "O-":["O-"]}
+            donorTypes=[]
+            for donorType in possibleTypes[bloodType]:
+                donorTypes.append({"bloodType":donorType})
+                #db.inventory.find( { $or: [ { quantity: 20 } , { price: 10 } ] } )
+            
+            name = ""
+            people =  {}
+            #persons = mongo.db.donors.find({"bloodType":bloodType, "zipcode": zipcode})
+            persons = mongo.db.donors.aggregate([ {"$match": { "$or": donorTypes , "place": place, "confirmed": True}}, {"$sample":{ "size": 10 }} ])
             if button == "Search Plasma Donors":
-                persons = mongo.db.donors.aggregate([ {"$match":{"$or": donorTypes, "zipcode": searchZipcodeUP, "confirmed": True, "plasma": True}}, {"$sample":{ "size": 10 }} ])
+                persons = mongo.db.donors.aggregate([ {"$match":{"$or": donorTypes, "place": place, "confirmed": True, "plasma": True}}, {"$sample":{ "size": 10 }} ])
+            #print(persons)
             for person in persons:
                 if "name" in person:
                     name = person["name"]
-                people [person["_id"]] = [name, person["phone"], person["zipcode"], person["bloodType"]]
+                people [person["_id"]] = [name, person["phone"], person["place"], person["bloodType"]]
+                #print (person, people)"""
 
-        if len(people) < 10:
-            persons = mongo.db.donors.aggregate([ {"$match":{"$or": donorTypes, "zipcode": searchZipcodeDOWN, "confirmed": True}}, {"$sample":{ "size": 10 - len(people) }} ])
-            if button == "Search Plasma Donors":
-                persons = mongo.db.donors.aggregate([ {"$match":{"$or": donorTypes, "zipcode": searchZipcodeDOWN, "confirmed": True, "plasma": True}}, {"$sample":{ "size": 10 }} ])
-            for person in persons:
-                if "name" in person:
-                    name = person["name"]
-                people [person["_id"]] = [name, person["phone"], person["zipcode"], person["bloodType"]]"""
+            if people == {}:
+                flash("No applicable donors near you", "warning")
+            return render_template ("showData.html", people = people, places=app.config['PLACES_API'], searchedType = bloodType, searchedPlace = place)
 
-        if people == {}:
-            flash("No applicable donors near you", "warning")
-        """elif len(people) < 10:
-            zipcodes = zipcode + ", " + searchZipcodeDOWN + ", " + searchZipcodeUP
-            flash("Unable to find 10 donors in "+zipcode, "warning")"""
-        return render_template ("showData.html", people = people, places=app.config['PLACES_API'])
+        elif "searchAgain" in request.form:
+            bloodType = request.form ["bloodType"]
+            place = request.form ["place"].strip()
+            #use session["people_considered"] = [10 people]
+            return request.form
 
 
 @app.route("/add", methods= ["GET", "POST"])
@@ -110,7 +95,7 @@ def add():
             plasma = True
         if "TandC" in request.form:
             agree = True
-            print (agree)
+            #print (agree)
         else:
             flash("Please agree to terms and conditions if you wish to register", "danger")
             return redirect ("/add")
@@ -129,13 +114,13 @@ def add():
 
         domain = app.config['DOMAIN']
         serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
-        print ("hi",domain, email)
+        #print ("hi",domain, email)
         token = serializer.dumps(email, salt=app.config['SECURITY_PASS_SALT'])
-        print ("hello",token)
+        #print ("hello",token)
         url = domain + "/email_verification?token=" + token
         
         message = Mail(
-            from_email='ankagugu@gmail.com',
+            from_email='support@vitalrelation.com',
             to_emails= email,
             subject='Vital Relation - Account Confirmation',
             html_content= render_template("createUser_email.html", name = name.title(), phone = phone, place = place, bloodType = bloodType, url = url))
@@ -203,8 +188,8 @@ if __name__ == "__main__":
 
 
 """up to 3 sarch agains, after have to wait 10 min, info icon"""
-#remove debug, change recieving email, from email, .org
-"""make the email prettier"""
+#remove debug, change recieving email
+"""make the email prettier, vaccination info"""
 """confirm email to delete user"""
 
 """https://covidwin.in/               Tracking availability of many types of Covid related resources.

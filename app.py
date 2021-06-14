@@ -26,7 +26,7 @@ app.config.update(
 
 mongo = PyMongo(app)
 
-regex = '^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$' #for sever-side validation of email
+regex_email = '^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$' #for sever-side validation of email
 
 
 @app.route("/", methods= ["GET", "POST"])
@@ -36,7 +36,7 @@ def showData():
     else:
         if "button" in request.form:
             bloodType = request.form ["bloodType"]
-            place = request.form ["place"].strip()
+            place = request.form ["place"].strip().lower()
             button = request.form["button"]
 
             if (bloodType == "" or place == ""):
@@ -59,9 +59,9 @@ def showData():
             name = ""
             people =  {}
             #persons = mongo.db.donors.find({"bloodType":bloodType, "zipcode": zipcode})
-            persons = mongo.db.donors.aggregate([ {"$match": { "$or": donorTypes , "place": place, "confirmed": True}}, {"$sample":{ "size": 10 }} ])
+            persons = mongo.db.donors.aggregate([ {"$match": { "$or": donorTypes , "place": {"$in":[place]}, "confirmed": True}}, {"$sample":{ "size": 10 }} ])
             if button == "Search Plasma Donors":
-                persons = mongo.db.donors.aggregate([ {"$match":{"$or": donorTypes, "place": place, "confirmed": True, "plasma": True}}, {"$sample":{ "size": 10 }} ])
+                persons = mongo.db.donors.aggregate([ {"$match":{"$or": donorTypes, "place": {"$in":[place]}, "confirmed": True, "plasma": True}}, {"$sample":{ "size": 10 }} ])
             #print(persons)
             for person in persons:
                 if "name" in person:
@@ -87,7 +87,7 @@ def add():
     else:
         name = request.form ["name"].strip().lower()
         phone = request.form ["phone"].strip()
-        place = request.form ["place"].strip()
+        place = request.form ["place"].strip().lower()
         bloodType = request.form ["bloodType"]
         email = request.form ["email"].strip().lower()
         plasma = False
@@ -102,11 +102,14 @@ def add():
         if (phone == "" or place == "" or bloodType == ""):
             flash("Please fill in all fields", "danger")
             return redirect ("/add")
-        elif not (re.search(regex, email)):
+        elif not (re.search(regex_email, email)):
             flash("Please enter valid email", "danger")
             return redirect ("/add")
         elif not ( phone.isnumeric() ):
             flash("Please enter numeric values for phone", "danger")
+            return redirect ("/add")
+        elif place.count(",") < 2:
+            flash("Please enter your place in 'City, State, Country' format", "danger")
             return redirect ("/add")
         person = {"name":name, "phone": phone, "place": place, "bloodType": bloodType, "email": email, "confirmed": False, "agreed_TandC":agree, "plasma":plasma}
         #print (person)
@@ -121,7 +124,7 @@ def add():
         
         message = Mail(
             from_email='support@vitalrelation.com',
-            to_emails= email,
+            to_emails= "ankagugu@gmail.com",
             subject='Vital Relation - Account Confirmation',
             html_content= render_template("createUser_email.html", name = name.title(), phone = phone, place = place, bloodType = bloodType, url = url))
         try:
@@ -184,13 +187,14 @@ def autoAddData():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
 
 
-"""up to 3 sarch agains, after have to wait 10 min, info icon"""
+"""up to 3 sarch agains, after have to wait 10 min, info icon, contains/in in mongo($in), city/state/country validation java, type of phone # (area code, adding the +1/+91), have ppl check spam (what if I didn't get the email), """
 #remove debug, change recieving email
 """make the email prettier, vaccination info"""
 """confirm email to delete user"""
+"""dlib library"""
 
 """https://covidwin.in/               Tracking availability of many types of Covid related resources.
 https://covid19-twitter.in/    Twitter query generator which finds info from Twitter.

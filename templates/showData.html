@@ -5,13 +5,19 @@
 
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
-    <ul class=flashes>
+<ul class=flashes>
     {% for category, message in messages %}
     <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
         {{message}}
-        </div>
+    </div>
+    {% if "check your inbox to confirm your account" in message%}
+    <div>
+        <button onclick="email_info()">Do not see the email?</button>
+        <p id="email_info"></p>
+    </div>
+    {% endif %}
     {% endfor %}
-    </ul>
+</ul>
 {% endif %}
 {% endwith %}
 
@@ -21,41 +27,53 @@
 <h3>To add a donor, click add donor above.</h3>
 {% endif %}
 
-
-<form method="POST">
-    <label>Sort by bloodtype:</label>
-    <select name="bloodType">
-        <option selected value="">{{searchedType}}</option>
-        <option value="A+">A+</option>
-        <option value="A-">A-</option>
-        <option value="B+">B+</option>
-        <option value="B-">B-</option>
-        <option value="AB+">AB+</option>
-        <option value="AB-">AB-</option>
-        <option value="O+">O+</option>
-        <option value="O-">O-</option>
-    </select>
-    <input type="text" name="place" value = "{{searchedPlace}}" placeholder="City, State, Country" id= "searchCity">
-    <input type="submit" value = "Search Blood Donors" class="btn btn-dark" name= "button">
-    <input type="submit" value = "Search Plasma Donors" class="btn btn-dark" name= "button">
+<form class="row gx-5 mx-4" method="POST">
+    <div class="row">
+        <div class="col-md-3 p-2">
+            <label class="form-label">Sort by bloodtype:</label>
+            <select class="form-select" name="bloodType">
+                <option selected value="">Pick Option Below...</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+            </select>
+        </div>
+        <div class="col-md-6 p-2">
+            <label class="form-label">City, State, Country</label>
+            <input type="text" class="form-control" name="place" value="{{searchedPlace}}" id="searchCity">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 p-2">
+            <input type="submit" value="Search Blood Donors" class="btn btn-dark" name="button">
+        </div>
+        <div class="col-md-4 p-2">
+            <input type="submit" value="Search Plasma Donors" class="btn btn-dark" name="button">
+        </div>
+    </div>
 </form>
 
-<div class = "row">
+<div class="row">
     {% for x in people %}
-        <div class="card bg-warning col-4" style="width: 18rem;">
-            <div class="card-body">
-                <h5 class="card-title">{{people[x][0].title()}}</h5>
-                <p class="card-title">Phone Number: {{people[x][1]}} </p>
-                <p class="card-text">Place: {{people[x][2]}} <br> Blood Type: {{people[x][3]}} </p>
-            </div>
+    <div class="card bg-warning col-4" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title">{{people[x][0].title()}}</h5>
+            <p class="card-title">Phone Number: {{people[x][1]}} </p>
+            <p class="card-text">Place: {{people[x][2]}} <br> Blood Type: {{people[x][3]}} </p>
         </div>
+    </div>
     {%  endfor %}
 </div>
- {% if people != {} %}
-<form method = "POST">
-    <input type = "text" name = "place" value= "{{searchedPlace}}" hidden>
-    <input type = "text" name = "bloodType" value="{{searchedType}}" hidden>
-    <input type="submit" value="Search Again" class="btn btn-dark" name= "searchAgain">
+{% if people != {} %}
+<form method="POST">
+    <input type="text" name="place" value="{{searchedPlace}}" hidden>
+    <input type="text" name="bloodType" value="{{searchedType}}" hidden>
+    <input type="submit" value="Search Again" class="btn btn-dark" name="searchAgain">
 </form>
 {% endif %}
 
@@ -63,12 +81,17 @@
 
 {% block scripts %}
 <script>
-    function activatePlacesSearch(){
+    function activatePlacesSearch() {
         var input = document.getElementById("searchCity")
         var autocomplete = new google.maps.places.Autocomplete(input);
     }
 </script>
 <script async
-src="https://maps.googleapis.com/maps/api/js?key={{places}}&libraries=places&callback=activatePlacesSearch">
+    src="https://maps.googleapis.com/maps/api/js?key={{places}}&libraries=places&callback=activatePlacesSearch">
+    </script>
+<script>
+    function email_info() {
+        document.getElementById("email_info").innerHTML = "Please check spam folder. The email has been sent. You can resend the email by adding yourself as a donor again.";
+    }
 </script>
 {% endblock %}

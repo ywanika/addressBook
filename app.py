@@ -86,6 +86,7 @@ def add():
         return render_template ("add.html", places=app.config['PLACES_API'])
     else:
         name = request.form ["name"].strip().lower()
+        area_code = request.form ["area_code"].strip()
         phone = request.form ["phone"].strip()
         place = request.form ["place"].strip().lower()
         bloodType = request.form ["bloodType"]
@@ -111,7 +112,7 @@ def add():
         elif place.count(",") < 2:
             flash("Please enter your place in 'City, State, Country' format", "danger")
             return redirect ("/add")
-        person = {"name":name, "phone": phone, "place": place, "bloodType": bloodType, "email": email, "confirmed": False, "agreed_TandC":agree, "plasma":plasma}
+        person = {"name":name, "phone": "+"+area_code+"-"+phone, "place": place, "bloodType": bloodType, "email": email, "confirmed": False, "agreed_TandC":agree, "plasma":plasma}
         #print (person)
         mongo.db.donors.insert_one(person)
 
@@ -194,7 +195,7 @@ if __name__ == "__main__":
 #remove debug, change recieving email
 """make the email prettier, vaccination info"""
 """confirm email to delete user"""
-"""dlib library"""
+"""dlib library, password should not have .strip"""
 
 """https://covidwin.in/               Tracking availability of many types of Covid related resources.
 https://covid19-twitter.in/    Twitter query generator which finds info from Twitter.

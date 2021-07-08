@@ -12,7 +12,7 @@
     </div>
     {% if "check your inbox to confirm your account" in message%}
     <div>
-        <button onclick="email_info()">Do not see the email?</button>
+        <button onclick="email_info()" class="btn btn-dark">Don't see the email?</button>
         <p id="email_info"></p>
     </div>
     {% endif %}
@@ -23,8 +23,9 @@
 
 {% if people == {}%}
 <h1>Vital Relation</h1>
-<h3>To search for a donor, enter your requirements below.</h3>
-<h3>To add a donor, click add donor above.</h3>
+<h4>To search for a donor, enter your requirements below.</h4>
+<h4>To add a donor, click add donor above.</h4>
+<br>
 {% endif %}
 
 <form class="row gx-5 mx-4" method="POST">
@@ -57,6 +58,11 @@
         </div>
     </div>
 </form>
+
+<div class= "my-3">
+    <p><strong>VITAL RELATION CAN NOT GARUNTEE EVERY LISTED DONOR IS ABLE OR WILLING TO DONATE.</strong></p>
+    <p>Please confirm they are fit to donate when you call them.</p>
+</div>
 
 <div class="row">
     {% for x in people %}

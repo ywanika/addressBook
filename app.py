@@ -54,14 +54,13 @@ def showData():
             donorTypes=[]
             for donorType in possibleTypes[bloodType]:
                 donorTypes.append({"bloodType":donorType})
-                #db.inventory.find( { $or: [ { quantity: 20 } , { price: 10 } ] } )
             
             name = ""
             people =  {}
             #persons = mongo.db.donors.find({"bloodType":bloodType, "zipcode": zipcode})
-            persons = mongo.db.donors.aggregate([ {"$match": { "$or": donorTypes , "place": {"$in":[place]}, "confirmed": True}}, {"$sample":{ "size": 10 }} ])
+            persons = mongo.db.donors.aggregate([ {"$match": { "$or": donorTypes , "place": {"$regex": place}, "confirmed": True}}, {"$sample":{ "size": 10 }} ])
             if button == "Search Plasma Donors":
-                persons = mongo.db.donors.aggregate([ {"$match":{"$or": donorTypes, "place": {"$in":[place]}, "confirmed": True, "plasma": True}}, {"$sample":{ "size": 10 }} ])
+                persons = mongo.db.donors.aggregate([ {"$match":{"$or": donorTypes, "place": {"$regex": place}, "confirmed": True, "plasma": True}}, {"$sample":{ "size": 10 }} ])
             #print(persons)
             for person in persons:
                 if "name" in person:
@@ -100,7 +99,7 @@ def add():
         else:
             flash("Please agree to terms and conditions if you wish to register", "danger")
             return redirect ("/add")
-        if (phone == "" or place == "" or bloodType == ""):
+        if (phone == "" or place == "" or bloodType == "" or area_code == "" or area_code == "+"):
             flash("Please fill in all fields", "danger")
             return redirect ("/add")
         elif not (re.search(regex_email, email)):
@@ -191,13 +190,8 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 
-"""up to 3 sarch agains, after have to wait 10 min, info icon, contains/in in mongo($in), city/state/country validation java, type of phone # (area code, adding the +1/+91), have ppl check spam (what if I didn't get the email), """
+"""up to 3 sarch agains, after have to wait 10 min, info icon, contains/in in mongo($in) ✅ , city/state/country validation java 🆗, +1/+91, have ppl check spam (what if I didn't get the email), """
 #remove debug, change recieving email
 """make the email prettier, vaccination info"""
 """confirm email to delete user"""
 """dlib library, password should not have .strip"""
-
-"""https://covidwin.in/               Tracking availability of many types of Covid related resources.
-https://covid19-twitter.in/    Twitter query generator which finds info from Twitter.
-https://covid19.neera.ai/      Provides beds information
-https://covidfightclub.org/   Lists Covid resource availability with phone numbers."""

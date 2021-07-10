@@ -20,7 +20,8 @@ app.config.update(
     SENDGRID_API= os.environ.get("SENDGRID_API"),
     DOMAIN= os.environ.get("DOMAIN"),
     SECURITY_PASS_SALT= os.environ.get("SECURITY_PASS_SALT"),
-    PLACES_API= os.environ.get("PLACES_API")
+    PLACES_API= os.environ.get("PLACES_API"),
+    TEST_EMAIL = os.environ.get("TEST_EMAIL")
 )
 
 
@@ -124,17 +125,31 @@ def add():
         #print ("hello",token)
         url = domain + "/email_verification?token=" + token
         
-        message = Mail(
-            from_email='support@vitalrelation.com',
-            to_emails= email,
-            subject='Vital Relation - Account Confirmation',
-            html_content= render_template("createUser_email.html", name = name.title(), phone = phone, place = place, bloodType = bloodType, url = url))
-        try:
-            sg = SendGridAPIClient(app.config['SENDGRID_API'])
-            response = sg.send(message)
-            flash("Please check your inbox to confirm your account. Thank you!", "success")
-        except Exception as e:
-            print(e)
+        if app.config["TEST_EMAIL"] is None:
+            message = Mail(
+                from_email='support@vitalrelation.com',
+                to_emails= email,
+                subject='Vital Relation - Account Confirmation',
+                html_content= render_template("createUser_email.html", name = name.title(), phone = phone, place = place, bloodType = bloodType, url = url))
+            try:
+                sg = SendGridAPIClient(app.config['SENDGRID_API'])
+                response = sg.send(message)
+                flash("Please check your inbox to confirm your account. Thank you!", "success")
+            except Exception as e:
+                print(e)
+                
+        else:
+            message = Mail(
+                from_email='support@vitalrelation.com',
+                to_emails= app.config["TEST_EMAIL"],
+                subject='Vital Relation - Account Confirmation',
+                html_content= render_template("createUser_email.html", name = name.title(), phone = phone, place = place, bloodType = bloodType, url = url))
+            try:
+                sg = SendGridAPIClient(app.config['SENDGRID_API'])
+                response = sg.send(message)
+                flash("Please check your inbox to confirm your account. Thank you!", "success")
+            except Exception as e:
+                print(e)
         return redirect ("/")
 
 

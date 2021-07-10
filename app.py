@@ -126,7 +126,7 @@ def add():
         
         message = Mail(
             from_email='support@vitalrelation.com',
-            to_emails= "ankagugu@gmail.com",
+            to_emails= email,
             subject='Vital Relation - Account Confirmation',
             html_content= render_template("createUser_email.html", name = name.title(), phone = phone, place = place, bloodType = bloodType, url = url))
         try:
@@ -189,7 +189,7 @@ def autoAddData():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
 
 
 """up to 3 sarch agains, after have to wait 10 min, info icon, +1/+91 🆗, have ppl check spam (what if I didn't get the email), """

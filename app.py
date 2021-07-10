@@ -137,7 +137,7 @@ def add():
                 flash("Please check your inbox to confirm your account. Thank you!", "success")
             except Exception as e:
                 print(e)
-                
+
         else:
             message = Mail(
                 from_email='support@vitalrelation.com',
@@ -207,7 +207,7 @@ if __name__ == "__main__":
     app.run()
 
 
-"""up to 3 sarch agains, after have to wait 10 min, info icon, +1/+91 🆗, have ppl check spam (what if I didn't get the email), """
+"""up to 3 sarch agains, after have to wait 10 min, info icon, +1/+91 🆗, have ppl check spam (what if I didn't get the email), favicon 16x16 32x32 64x64"""
 #remove debug, change recieving email
 """make the email prettier, vaccination info"""
 """confirm email to delete user"""

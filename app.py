@@ -86,6 +86,8 @@ def add():
     else:
         name = request.form ["name"].strip().lower()
         area_code = request.form ["area_code"].strip()
+        if "+" in area_code:
+            area_code= area_code.replace("+", "")
         phone = request.form ["phone"].strip()
         place = request.form ["place"].strip().lower()
         bloodType = request.form ["bloodType"]
@@ -105,8 +107,8 @@ def add():
         elif not (re.search(regex_email, email)):
             flash("Please enter valid email", "danger")
             return redirect ("/add")
-        elif not ( phone.isnumeric() ):
-            flash("Please enter numeric values for phone", "danger")
+        elif not phone.isnumeric() or not area_code.isnumeric():
+            flash("Please enter numeric values for phone number and area code", "danger")
             return redirect ("/add")
         elif place.count(",") < 2:
             flash("Please enter your place in 'City, State, Country' format", "danger")
@@ -190,7 +192,7 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 
-"""up to 3 sarch agains, after have to wait 10 min, info icon, contains/in in mongo($in) ✅ , city/state/country validation java 🆗, +1/+91, have ppl check spam (what if I didn't get the email), """
+"""up to 3 sarch agains, after have to wait 10 min, info icon, +1/+91 🆗, have ppl check spam (what if I didn't get the email), """
 #remove debug, change recieving email
 """make the email prettier, vaccination info"""
 """confirm email to delete user"""

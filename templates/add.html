@@ -14,10 +14,10 @@
 {% endif %}
 {% endwith %}
 
-<form class="row gx-5 mx-4" method="POST">
+<form class="row gx-5 mx-4" method="POST" autocomplete="on">
     <div class="col-md-6 p-2">
         <label class="form-label">Initials or Fake Name</label>
-        <input type="text" class="form-control" name="name">
+        <input type="text" class="form-control" name="name" autocomplete="off">
     </div>
     <div class="col-md-6 p-2">
         <label class="form-label">Blood Type</label>
@@ -35,7 +35,7 @@
     </div>
     <div class="col-12 p-2">
         <label class="form-label">City, State, Country</label>
-        <input type="text" class="form-control" name="place" id="searchCity">
+        <input type="text" class="form-control" name="place" id="searchCity" autocomplete="off">
     </div>
     <div class="col-md-1 p-2">
         <label class="form-label">Area Code</label>
@@ -43,11 +43,11 @@
     </div>
     <div class="col-md-3 p-2">
         <label class="form-label">Phone Number</label>
-        <input type="text" class="form-control" name="phone">
+        <input type="text" class="form-control" name="phone" autocomplete="mobile">
     </div>
     <div class="col-md-6 p-2">
         <label class="form-label">Email Address</label>
-        <input type="text" class="form-control" name="email">
+        <input type="text" class="form-control" name="email" autocomplete="email">
     </div>
     <div class="col-12">
         <div class="form-check p-2">

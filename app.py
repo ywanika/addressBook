@@ -111,7 +111,7 @@ def add():
         elif not phone.isnumeric() or not area_code.isnumeric():
             flash("Please enter numeric values for phone number and area code", "danger")
             return redirect ("/add")
-        elif place.count(",") < 2:
+        elif place.count(",") != 2 or len(place) < 5:
             flash("Please enter your place in 'City, State, Country' format", "danger")
             return redirect ("/add")
         person = {"name":name, "phone": "+"+area_code+"-"+phone, "place": place, "bloodType": bloodType, "email": email, "confirmed": False, "agreed_TandC":agree, "plasma":plasma}

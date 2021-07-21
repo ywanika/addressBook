@@ -204,7 +204,7 @@ def autoAddData():
 
 @app.errorhandler(404)
 def page_not_found(error):
-    flash("Page Not Found", "error")
+    flash("Page Not Found", "danger")
     return redirect("/")
 
 if __name__ == "__main__":

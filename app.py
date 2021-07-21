@@ -208,7 +208,7 @@ if __name__ == "__main__":
 
 
 """up to 3 sarch agains, after have to wait 10 min, info icon, +1/+91 🆗, have ppl check spam (what if I didn't get the email), favicon 16x16 32x32 64x64"""
-#remove debug, change recieving email
+#remove debug
 """make the email prettier, vaccination info"""
 """confirm email to delete user"""
 """dlib library, password should not have .strip"""

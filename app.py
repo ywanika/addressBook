@@ -202,9 +202,13 @@ def autoAddData():
     flash("Added! Thank you!", "success")
     return redirect ("/")"""
 
+@app.errorhandler(404)
+def page_not_found(error):
+    flash("Page Not Found", "error")
+    return redirect("/")
 
 if __name__ == "__main__":
-    app.run(debug = True)
+    app.run()
 
 
 """up to 3 sarch agains, after have to wait 10 min, info icon, +1/+91 🆗, have ppl check spam (what if I didn't get the email)"""

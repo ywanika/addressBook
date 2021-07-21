@@ -165,8 +165,12 @@ def email_verification():
         flash("It seems this link has expired", "warning")
     return redirect("/")
 
+@app.route("/otherResources")
+def otherResource():
+    return render_template ("otherResources.html")
 
-@app.route("/deleteUser", methods= ["GET", "POST"])
+
+"""@app.route("/deleteUser", methods= ["GET", "POST"])
 def deleteUser():
     if request.method == "GET":
         return render_template ("deleteUser.html")
@@ -180,10 +184,6 @@ def deleteUser():
             return redirect ("/")
         flash("didn't work", "warning")
         return redirect ("/deleteUser")
-
-@app.route("/otherResources")
-def otherResource():
-    return render_template ("otherResources.html")
 
 @app.route("/autoAddData")
 def autoAddData():
@@ -200,7 +200,7 @@ def autoAddData():
         #print (person)
         mongo.db.donors.insert_one(person)
     flash("Added! Thank you!", "success")
-    return redirect ("/")
+    return redirect ("/")"""
 
 
 if __name__ == "__main__":

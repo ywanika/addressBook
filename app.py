@@ -53,6 +53,11 @@ def showData():
             "O+":["O-", "O+"],
             "O-":["O-"]}
             donorTypes=[]
+
+            if bloodType not in possibleTypes:
+                flash("Invalid Blood Type", "danger")
+                return redirect ("/")
+
             for donorType in possibleTypes[bloodType]:
                 donorTypes.append({"bloodType":donorType})
             
@@ -211,7 +216,7 @@ if __name__ == "__main__":
     app.run()
 
 
-"""up to 3 sarch agains, after have to wait 10 min, info icon, +1/+91 🆗, have ppl check spam (what if I didn't get the email)"""
+"""up to 3 sarch agains, after have to wait 10 min, info icon, +1/+91 🆗, have ppl check spam (what if I didn't get the email), 500 errorhandler"""
 #remove debug
 """make the email prettier, vaccination info"""
 """confirm email to delete user"""

@@ -76,13 +76,53 @@ def showData():
 
             if people == {}:
                 flash("No applicable donors near you", "warning")
-            return render_template ("showData.html", people = people, places=app.config['PLACES_API'], searchedType = bloodType, searchedPlace = place)
+            return render_template ("showData.html", people = people, places=app.config['PLACES_API'], searchedType = bloodType, searchedPlace = place, previousSearch = button)
 
         elif "searchAgain" in request.form:
+            print("searching again")
             bloodType = request.form ["bloodType"]
             place = request.form ["place"].strip()
+            previousSearch = ""
+            if "previousSearch" in request.form:
+                previousSearch = request.form ["previousSearch"]
             #use session["people_considered"] = [10 people]
-            return request.form
+            if (bloodType == "" or place == ""):
+                flash("Please fill in all fields", "danger")
+                return redirect ("/")
+
+            possibleTypes={"AB+":["O-", "O+", "B-", "B+", "A-", "A+", "AB-", "AB+"],
+            "AB-":["O-", "B-", "A-", "AB-"],
+            "A+":["O-", "O+", "A-", "A+"],
+            "A-":["O-", "A-"],
+            "B+":["O-", "O+", "B-", "B+"],
+            "B-":["O-", "B-"],
+            "O+":["O-", "O+"],
+            "O-":["O-"]}
+            donorTypes=[]
+
+            if bloodType not in possibleTypes:
+                flash("Invalid Blood Type", "danger")
+                return redirect ("/")
+
+            for donorType in possibleTypes[bloodType]:
+                donorTypes.append({"bloodType":donorType})
+            
+            name = ""
+            people =  {}
+            #persons = mongo.db.donors.find({"bloodType":bloodType, "zipcode": zipcode})
+            persons = mongo.db.donors.aggregate([ {"$match": { "$or": donorTypes , "place": {"$regex": place}, "confirmed": True}}, {"$sample":{ "size": 10 }} ])
+            if previousSearch == "Search Plasma Donors":
+                persons = mongo.db.donors.aggregate([ {"$match":{"$or": donorTypes, "place": {"$regex": place}, "confirmed": True, "plasma": True}}, {"$sample":{ "size": 10 }} ])
+            #print(persons)
+            for person in persons:
+                if "name" in person:
+                    name = person["name"]
+                people [person["_id"]] = [name, person["phone"], person["place"], person["bloodType"]]
+                #print (person, people)"""
+
+            if people == {}:
+                flash("No applicable donors near you", "warning")
+            return render_template ("showData.html", people = people, places=app.config['PLACES_API'], searchedType = bloodType, searchedPlace = place, previousSearch = previousSearch)
 
 
 @app.route("/add", methods= ["GET", "POST"])
@@ -174,49 +214,21 @@ def email_verification():
 def otherResource():
     return render_template ("otherResources.html")
 
-
-"""@app.route("/deleteUser", methods= ["GET", "POST"])
-def deleteUser():
-    if request.method == "GET":
-        return render_template ("deleteUser.html")
-    else:
-        name = request.form ["name"].strip()
-        phone = request.form ["phone"].strip()
-        person = mongo.db.donors.find_one({"name":name, "phone": phone})
-        if person != None:
-            mongo.db.donors.delete_one({"name":name, "phone": phone})
-            flash( name+" removed !", "success")
-            return redirect ("/")
-        flash("didn't work", "warning")
-        return redirect ("/deleteUser")
-
-@app.route("/autoAddData")
-def autoAddData():
-    for x in range (5):
-        person = {"name":"TEST", "phone": "123"+str(x), "place": "0010", "bloodType": "A+","email": "test"+str(x)+"@anika.com", "confirmed": True }
-        #print (person)
-        mongo.db.donors.insert_one(person)
-    for x in range (5):
-        person = {"name":"TEST", "phone": "122"+str(x), "place": "0011", "bloodType": "A-","email": "test1"+str(x)+"@anika.com", "confirmed": True }
-        #print (person)
-        mongo.db.donors.insert_one(person)
-    for x in range (5):
-        person = {"name":"TEST", "phone": "121"+str(x), "place": "0009", "bloodType": "O-","email": "test2"+str(x)+"@anika.com", "confirmed": True }
-        #print (person)
-        mongo.db.donors.insert_one(person)
-    flash("Added! Thank you!", "success")
-    return redirect ("/")"""
-
 @app.errorhandler(404)
 def page_not_found(error):
     flash("Page Not Found", "danger")
+    return redirect("/")
+
+@app.errorhandler(500)
+def something_wrong(error):
+    flash("Something Went Wrong", "danger")
     return redirect("/")
 
 if __name__ == "__main__":
     app.run()
 
 
-"""up to 3 sarch agains, after have to wait 10 min, info icon, +1/+91 🆗, have ppl check spam (what if I didn't get the email), 500 errorhandler"""
+"""up to 3 sarch agains, after have to wait 10 min, info icon, +1/+91 🆗, have ppl check spam (what if I didn't get the email), profanity filter, get it out, testing, promote to production, search again, space, contact us, save info on add - javascript"""
 #remove debug
 """make the email prettier, vaccination info"""
 """confirm email to delete user"""

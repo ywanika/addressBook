@@ -21,13 +21,14 @@
 {% endif %}
 {% endwith %}
 
+<div class= "jumbotron mb-3">
 {% if people == {}%}
 <h1>Vital Relation</h1>
-<h4>To search for a donor, enter your requirements below.</h4>
-<h4>To add a donor, click add donor above.</h4>
-<br>
+<a href= "/add"><button class="btn btn-dark">Become a Donor</button></a>
 {% endif %}
+</div>
 
+<h4>To search for a donor, enter your requirements below.</h4>
 <form class="row gx-5 mx-4" method="POST">
     <div class="row">
         <div class="col-md-3 p-2">
@@ -79,6 +80,7 @@
 <form method="POST">
     <input type="text" name="place" value="{{searchedPlace}}" hidden>
     <input type="text" name="bloodType" value="{{searchedType}}" hidden>
+    <input type="text" name="previousSearch" value="{{previousSearch}}" hidden>
     <input type="submit" value="Search Again" class="btn btn-dark" name="searchAgain">
 </form>
 {% endif %}

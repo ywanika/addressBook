@@ -228,8 +228,8 @@ if __name__ == "__main__":
     app.run()
 
 
-"""up to 3 sarch agains, after have to wait 10 min, info icon, +1/+91 🆗, have ppl check spam (what if I didn't get the email), profanity filter, get it out, testing, promote to production, search again, space, contact us, save info on add - javascript"""
+"""up to 3 sarch agains, after have to wait 10 min, info icon, +1/+91 🆗, have ppl check spam (what if I didn't get the email), get it out, testing, promote to production, contact us, save info on add - javascript"""
 #remove debug
 """make the email prettier, vaccination info"""
 """confirm email to delete user"""
-"""dlib library, password should not have .strip"""
+"""profanity fileter, combine search again + main search funtionalities"""

@@ -163,7 +163,7 @@ def add():
         
         if app.config["TEST_EMAIL"] is None:
             message = Mail(
-                from_email='support@vitalrelation.com',
+                from_email=('support@vitalrelation.com', "Vital Relation Support"),
                 to_emails= email,
                 subject='Vital Relation - Account Confirmation',
                 html_content= render_template("createUser_email.html", name = name.title(), phone = phone, place = place.title(), bloodType = bloodType, url = url))
@@ -176,7 +176,7 @@ def add():
 
         else:
             message = Mail(
-                from_email='support@vitalrelation.com',
+                from_email=('support@vitalrelation.com', "Vital Relation Support"),
                 to_emails= app.config["TEST_EMAIL"],
                 subject='Vital Relation - Account Confirmation',
                 html_content= render_template("createUser_email.html", name = name.title(), phone = phone, place = place.title(), bloodType = bloodType, url = url))

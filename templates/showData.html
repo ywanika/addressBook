@@ -12,7 +12,7 @@
     </div>
     {% if "check your inbox to confirm your account" in message%}
     <div>
-        <button onclick="email_info()" class="btn btn-dark">Don't see the email?</button>
+        <button onclick="email_info()" class="btn" style= "color: white; background-color: #197278">Don't see the email?</button>
         <p id="email_info"></p>
     </div>
     {% endif %}
@@ -21,14 +21,15 @@
 {% endif %}
 {% endwith %}
 
-<div class= "jumbotron mb-3">
 {% if people == {}%}
-<h1>Vital Relation</h1>
-<a href= "/add"><button class="btn btn-dark">Become a Donor</button></a>
-{% endif %}
+<div class= "jumbotron mb-3">
+    <h1>Vital Relation</h1>
+    <h4>To connect potential blood/plasma donors with people in times of need.</h4>
+    <a href= "/add"><button class="btn" style= "color: white; background-color: #197278">Become a Donor!</button></a>
 </div>
 
 <hr class = "my-4">
+{% endif %}
 
 <h4>To search for a donor, enter your requirements below.</h4>
 <form class="row gx-5 mx-4" method="POST">
@@ -54,22 +55,22 @@
     </div>
     <div class="row">
         <div class="col-md-4 p-2">
-            <input type="submit" value="Search Blood Donors" class="btn btn-dark" name="button">
+            <input type="submit" value="Search Blood Donors" class="btn" style= "color: white; background-color: #ed5058" name="button">
         </div>
         <div class="col-md-4 p-2">
-            <input type="submit" value="Search Plasma Donors" class="btn btn-dark" name="button">
+            <input type="submit" value="Search Plasma Donors" class="btn" style= "color: white; background-color: #ed5058"  name="button">
         </div>
     </div>
 </form>
 
-<div class= "my-3">
+<div class= "my-3" >
     <p><strong>VITAL RELATION CAN NOT GUARANTEE EVERY LISTED DONOR IS ABLE OR WILLING TO DONATE.</strong></p>
     <p>Please confirm they are fit to donate when you call them.</p>
 </div>
 
 <div class="row">
     {% for x in people %}
-    <div class="card bg-warning col-4" style="width: 18rem;">
+    <div class="card col-4" style="width: 18rem; background-color: #e8f7ee;">
         <div class="card-body">
             <h5 class="card-title">{{people[x][0].title()}}</h5>
             <p class="card-title">Phone Number: {{people[x][1]}} </p>
@@ -78,8 +79,9 @@
     </div>
     {%  endfor %}
 </div>
+<br>
 {% if people != {} %}
-<form method="POST">
+<form method="POST" class = "my-3">
     <input type="text" name="place" value="{{searchedPlace}}" hidden>
     <input type="text" name="bloodType" value="{{searchedType}}" hidden>
     <input type="text" name="previousSearch" value="{{previousSearch}}" hidden>

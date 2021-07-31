@@ -67,19 +67,16 @@ def showData():
             persons = mongo.db.donors.aggregate([ {"$match": { "$or": donorTypes , "place": {"$regex": place}, "confirmed": True}}, {"$sample":{ "size": 10 }} ])
             if button == "Search Plasma Donors":
                 persons = mongo.db.donors.aggregate([ {"$match":{"$or": donorTypes, "place": {"$regex": place}, "confirmed": True, "plasma": True}}, {"$sample":{ "size": 10 }} ])
-            #print(persons)
             for person in persons:
                 if "name" in person:
                     name = person["name"]
                 people [person["_id"]] = [name, person["phone"], person["place"], person["bloodType"]]
-                #print (person, people)"""
 
             if people == {}:
                 flash("No applicable donors near you", "warning")
             return render_template ("showData.html", people = people, places=app.config['PLACES_API'], searchedType = bloodType, searchedPlace = place, previousSearch = button)
 
         elif "searchAgain" in request.form:
-            print("searching again")
             bloodType = request.form ["bloodType"]
             place = request.form ["place"].strip()
             previousSearch = ""
@@ -113,12 +110,10 @@ def showData():
             persons = mongo.db.donors.aggregate([ {"$match": { "$or": donorTypes , "place": {"$regex": place}, "confirmed": True}}, {"$sample":{ "size": 10 }} ])
             if previousSearch == "Search Plasma Donors":
                 persons = mongo.db.donors.aggregate([ {"$match":{"$or": donorTypes, "place": {"$regex": place}, "confirmed": True, "plasma": True}}, {"$sample":{ "size": 10 }} ])
-            #print(persons)
             for person in persons:
                 if "name" in person:
                     name = person["name"]
                 people [person["_id"]] = [name, person["phone"], person["place"], person["bloodType"]]
-                #print (person, people)"""
 
             if people == {}:
                 flash("No applicable donors near you", "warning")
@@ -143,7 +138,6 @@ def add():
             plasma = True
         if "TandC" in request.form:
             agree = True
-            #print (agree)
         else:
             flash("Please agree to terms and conditions if you wish to register", "danger")
             return redirect ("/add")
@@ -160,14 +154,11 @@ def add():
             flash("Please enter your place in 'City, State, Country' format", "danger")
             return redirect ("/add")
         person = {"name":name, "phone": "+"+area_code+"-"+phone, "place": place, "bloodType": bloodType, "email": email, "confirmed": False, "agreed_TandC":agree, "plasma":plasma}
-        #print (person)
         mongo.db.donors.insert_one(person)
 
         domain = app.config['DOMAIN']
         serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
-        #print ("hi",domain, email)
         token = serializer.dumps(email, salt=app.config['SECURITY_PASS_SALT'])
-        #print ("hello",token)
         url = domain + "/email_verification?token=" + token
         
         if app.config["TEST_EMAIL"] is None:
@@ -175,7 +166,7 @@ def add():
                 from_email='support@vitalrelation.com',
                 to_emails= email,
                 subject='Vital Relation - Account Confirmation',
-                html_content= render_template("createUser_email.html", name = name.title(), phone = phone, place = place, bloodType = bloodType, url = url))
+                html_content= render_template("createUser_email.html", name = name.title(), phone = phone, place = place.title(), bloodType = bloodType, url = url))
             try:
                 sg = SendGridAPIClient(app.config['SENDGRID_API'])
                 response = sg.send(message)
@@ -188,7 +179,7 @@ def add():
                 from_email='support@vitalrelation.com',
                 to_emails= app.config["TEST_EMAIL"],
                 subject='Vital Relation - Account Confirmation',
-                html_content= render_template("createUser_email.html", name = name.title(), phone = phone, place = place, bloodType = bloodType, url = url))
+                html_content= render_template("createUser_email.html", name = name.title(), phone = phone, place = place.title(), bloodType = bloodType, url = url))
             try:
                 sg = SendGridAPIClient(app.config['SENDGRID_API'])
                 response = sg.send(message)
@@ -228,7 +219,7 @@ if __name__ == "__main__":
     app.run()
 
 
-"""up to 3 sarch agains, after have to wait 10 min, info icon, +1/+91 🆗, have ppl check spam (what if I didn't get the email), get it out, testing, promote to production, contact us, save info on add - javascript"""
+"""up to 3 sarch agains, after have to wait 10 min, info icon, +1/+91 🆗, have ppl check spam (what if I didn't get the email), get it out, testing, promote to production, contact us, save info on add - javascript, about page"""
 #remove debug
 """make the email prettier, vaccination info"""
 """confirm email to delete user"""

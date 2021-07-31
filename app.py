@@ -29,6 +29,21 @@ mongo = PyMongo(app)
 
 regex_email = '^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$' #for sever-side validation of email
 
+#redirect http to https
+@app.before_request
+def before_request():
+    if os.environ.get("DEPLOYMENT") == "vital-relation-production":
+        if request.url.startswith("http://"):
+            url = request.url.replace("http://", "https://", 1)
+            code = 301
+            return redirect(url, code = code)
+        elif request.url.startswith("v"):
+            url = request.url.replace("v", "https://v", 1)
+            code = 301
+            return redirect(url, code = code)
+        elif "favicon" in request.url:
+            return redirect("/")
+
 
 @app.route("/", methods= ["GET", "POST"])
 def showData():

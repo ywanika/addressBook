@@ -6,6 +6,7 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
+from datetime import datetime
 
 # loading environment from .env file
 app_path = os.path.join(os.path.dirname(__file__), '.')
@@ -216,6 +217,21 @@ def email_verification():
         flash("It seems this link has expired", "warning")
     return redirect("/")
 
+@app.route("/feedback", methods = ["GET", "POST"])
+def feedback():
+    if request.method == "GET":
+        return render_template ("feedback.html")
+    else:
+        email = request.form["email"].strip().lower()
+        feedback = request.form["feedback"]
+        if email != "":
+            if not (re.search(regex_email, email)):
+                flash("Please enter valid email", "danger")
+                return redirect ("/feedback")
+        mongo.db.feedback.insert_one({"email":email, "feedback":feedback, "time_updated":datetime.utcnow()})
+
+        return redirect ("/feedback")
+
 @app.route("/otherResources")
 def otherResource():
     return render_template ("otherResources.html")
@@ -231,11 +247,11 @@ def something_wrong(error):
     return redirect("/")
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug= True)
 
 
-"""up to 3 sarch agains, after have to wait 10 min, info icon, +1/+91 🆗, have ppl check spam (what if I didn't get the email), get it out, testing, promote to production, contact us, save info on add - javascript, about page"""
+"""up to 3 sarch agains, after have to wait 10 min, info icon, +1/+91 🆗, have ppl check spam (what if I didn't get the email), get it out, testing, promote to production, contact us, save info on add - javascript, about page, confrim email"""
 #remove debug
 """make the email prettier, vaccination info"""
 """confirm email to delete user"""
-"""profanity fileter, combine search again + main search funtionalities"""
+"""profanity fileter, combine search again + main search funtionalities, display feedback = flask moment"""

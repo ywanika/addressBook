@@ -247,7 +247,7 @@ def something_wrong(error):
     return redirect("/")
 
 if __name__ == "__main__":
-    app.run(debug= True)
+    app.run()
 
 
 """up to 3 sarch agains, after have to wait 10 min, info icon, +1/+91 🆗, have ppl check spam (what if I didn't get the email), get it out, testing, promote to production, contact us, save info on add - javascript, about page, confrim email"""
